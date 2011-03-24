@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  This is an example Ant build file for an Aiarch/Hierarchy
+  bot. You don't really need to know Ant in order to use
+  this file. Just update the information in the four
+  properties below, and run the command "ant".
+  
+  For more information, see the Aiarch User's Guide at
+    http://wiki.tkk.fi/display/T934400/Guide
+-->
+
+<project name="bot" default="package" basedir=".">
+	<!--
+	  Name of the bot.
+	  Must match the "package" declarations in the Java
+	  code, so therefore should only contain lowercase
+	  letters of the English alphabet.
+	-->
+	<property name="bot" value="minmaxsimple" />
+	
+	<!-- The class implementing the Player interface: -->
+	<property name="botclass" value="SimpleVersion" />
+	
+	<!-- Your real name: -->
+	<property name="author" value="Sami Airaksinen" />
+	
+	<!-- Your student ID number: -->
+	<property name="studentid" value="83955R" />
+	
+	<!--
+	  Human-readable name for the bot.
+	  This default value does not need to be changed, if
+	  you don't mind using the package name as the bot name.
+	  This name can contain spaces and such.
+	-->
+	<property name="botname" value="${bot}" />
+	
+	<!--
+	  No changes should be needed below this line.
+	-->
+	
+	<property name="build.dir" location="bin" />
+	
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${build.dir}" />
+	</target>
+	
+	<target name="build" depends="init" description="compile all code">
+		<javac srcdir="." destdir="${build.dir}"
+			classpath="aiarch.jar"
+			source="1.6" target="1.6" debug="true" />
+	</target>
+	
+	<target name="package" depends="build"
+		description="build a .jar package">
+		<jar destfile="${bot}.jar" basedir="${build.dir}">
+			<manifest>
+				<attribute name="Bot-Class" value="${bot}.${botclass}" />
+				<attribute name="Bot-Author" value="${author}" />
+				<attribute name="Bot-Student-ID" value="${studentid}" />
+				<attribute name="Bot-Name" value="${botname}" />
+			</manifest>
+			<zipfileset dir="." prefix="${bot}">
+				<include name="**.java" />
+			</zipfileset>
+		</jar>
+	</target>
+	
+	<target name="clean" description="clean up generated files">
+		<delete dir="${build.dir}" />
+		<delete file="${bot}.jar" />
+	</target>
+</project>

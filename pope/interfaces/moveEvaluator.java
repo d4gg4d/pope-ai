@@ -11,5 +11,13 @@ import fi.zem.aiarch.game.hierarchy.Situation;
  */
 public interface moveEvaluator 
 {
+	/**
+	 * Asks evaluator to calculate best possible move 
+	 * with given time range.
+	 * 
+	 * @param state
+	 * @param timeLimit
+	 * @return
+	 */
 	public Move getBesMove(Situation state, Integer timeLimit);	
 }

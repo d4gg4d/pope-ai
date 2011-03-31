@@ -22,6 +22,8 @@ public class Itself implements Player {
 	private moveEvaluator moveEvaluator;
 	
 	public Itself() {		
+		MinMaxBasic.CUT_DEPTH = 3;
+
 		// weights for different aspects
 		// utility function
 		// seek depth
@@ -30,8 +32,8 @@ public class Itself implements Player {
 	
 	public void start(Engine engine, Side side) 
 	{
-		MinMaxBasic.game = engine;
-		MinMaxBasic.side = side;
+		MinMaxBasic.GAME = engine;
+		MinMaxBasic.SIDE = side;
 	}
 	
 	public Move move(Situation situation, int timeLeft) 

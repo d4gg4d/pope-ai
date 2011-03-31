@@ -27,7 +27,7 @@ public class MinMaxBasic implements moveEvaluator
 		
 	public MinMaxBasic(Situation root)
 	{
-		gameTree = new GameTreeNode(root);
+		gameTree = new GameTreeNode(root, 0);
 	}
 		
 	@Override
@@ -59,7 +59,7 @@ public class MinMaxBasic implements moveEvaluator
 				return bestNextSitutation.getPreviousMove();
 			}
 		}
-		return null;
+		throw new Exception("Error in selecting next move.");
 	}
 	
 	private Integer maxValue(GameTreeNode node) throws Exception
@@ -73,7 +73,7 @@ public class MinMaxBasic implements moveEvaluator
 				
 		for (Situation current : nextPossibleStates(node.state) ) 
 		{
-			GameTreeNode nextNode = new GameTreeNode(current);
+			GameTreeNode nextNode = new GameTreeNode(current, node.depth + 1);
 			value = Math.max(value, minValue(nextNode));
 			nextNode.value = value;
 			node.addChild(nextNode);
@@ -92,7 +92,7 @@ public class MinMaxBasic implements moveEvaluator
 		
 		for (Situation current : nextPossibleStates(node.state) ) 
 		{
-			GameTreeNode nextNode = new GameTreeNode(current);
+			GameTreeNode nextNode = new GameTreeNode(current, node.depth + 1);
 			value = Math.min(value, maxValue(nextNode));
 			nextNode.value = value;
 			node.addChild(nextNode);

@@ -27,7 +27,7 @@ public class MinMaxBasic implements moveEvaluator
 		
 	public MinMaxBasic(Situation root)
 	{
-		gameTree = new GameTreeNode(root, 0);
+		gameTree = new GameTreeNode(root);
 	}
 		
 	@Override

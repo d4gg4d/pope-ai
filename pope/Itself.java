@@ -33,7 +33,6 @@ public class Itself implements Player {
 	public void start(Engine engine, Side side) 
 	{
 		MinMaxBasic.GAME = engine;
-		MinMaxBasic.SIDE = side;
 	}
 	
 	public Move move(Situation situation, int timeLeft) 

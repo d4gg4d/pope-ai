@@ -21,7 +21,6 @@ import fi.zem.aiarch.game.hierarchy.Board.Square;
 public class MinMaxBasic implements moveEvaluator 
 {	
 	public static Engine GAME;	
-	public static Side SIDE;	
 	public static Integer CUT_DEPTH;
 	
 	private GameTreeNode gameTree;
@@ -164,13 +163,13 @@ public class MinMaxBasic implements moveEvaluator
 	private Integer utility(Situation state) throws Exception
 	{
 		Integer util;
-		if (state.getWinner() == SIDE)
-		{
-			util = Integer.MAX_VALUE; // should here be win exception, what it should do??
-		}
-		else if (state.getWinner() == SIDE.opposite())
+		if (state.getWinner() == state.getTurn())
 		{
 			util = Integer.MIN_VALUE; // should here be lose exception?
+		}
+		else if (state.getWinner() == state.getTurn().opposite())
+		{
+			util = Integer.MAX_VALUE; // should here be win exception, what it should do??
 		}
 		else if (state.getWinner() == Side.NONE)
 		{
@@ -180,7 +179,6 @@ public class MinMaxBasic implements moveEvaluator
 		{
 			// cut depth
 			util = evaluateInCompleteGame(state);
-			throw new Exception("Utility function accessed in non-finished state!");
 		}
 		return util;
 	}
@@ -194,21 +192,40 @@ public class MinMaxBasic implements moveEvaluator
 	private Integer evaluateInCompleteGame(Situation state)
 	{
 		Integer value = 0;
+		
 		Integer positionWeight = 10;
 		Integer firepowerWeight = 10;
 		Integer rankWeight = 10;
 		
-		Iterable<Square> own = state.getBoard().pieces(SIDE);
+		Integer epositionWeight = 10;
+		Integer efirepowerWeight = 10;
+		Integer erankWeight = 50;
+				
+		Iterable<Square> own = state.getBoard().pieces(state.getTurn());
+		Iterable<Square> enemy = state.getBoard().pieces(state.getTurn().opposite());
+
+		//OWN AS POSITIVE value
 		
 		//eval own pieces position 
-		value += positionWeight * evalPiecesPosition(own);
+		value += positionWeight * evalPiecesPosition(own, state.getTurn());
 		
 		//eval own pieces firepower
-		value += firepowerWeight * evalPiecesFirePower(own, state.getBoard());
+		value += firepowerWeight * evalPiecesFirePower(own, state.getBoard(), state.getTurn());
 
 		//eval own pieces rank
 		value += rankWeight * evalPiecesRank(own);
-				
+		
+		//ENEMY AS negative value
+		
+		//eval enemy pieces position 
+		value -= epositionWeight * evalPiecesPosition(enemy, state.getTurn().opposite());
+		
+		//eval enemy pieces firepower
+		value -= efirepowerWeight * evalPiecesFirePower(enemy, state.getBoard(), state.getTurn().opposite());
+
+		//eval enemy pieces rank
+		value -= erankWeight * evalPiecesRank(enemy);
+		
 		return value;
 	}
 	
@@ -220,18 +237,18 @@ public class MinMaxBasic implements moveEvaluator
 		return value;
 	}
 
-	private Integer evalPiecesFirePower(Iterable<Square> own, Board board) {
+	private Integer evalPiecesFirePower(Iterable<Square> own, Board board, Side side) {
 		Integer value = 0;
 		for (Square current : own) {
-			value += board.firepower(SIDE, current.getX(), current.getY());
+			value += board.firepower(side, current.getX(), current.getY());
 		}		
 		return value;
 	}
 
-	private Integer evalPiecesPosition(Iterable<Square> own) {
+	private Integer evalPiecesPosition(Iterable<Square> own, Side side) {
 		Integer value = 0;
 		for (Square current : own) {
-			value -= (current.getOwner() == SIDE.opposite()) ? 1 : 0;
+			value -= (current.getOwner() == side.opposite()) ? 1 : 0;
 		}
 		return value;
 	}

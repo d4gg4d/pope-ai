@@ -1,6 +1,7 @@
 package pope.interfaces;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import fi.zem.aiarch.game.hierarchy.Side;
 import fi.zem.aiarch.game.hierarchy.Situation;
@@ -10,7 +11,7 @@ public interface Heuristics {
 	/**
 	 * Set weight parameters for different utility function components.
 	 */
-	void setWeights(ArrayList<Integer> weigths);
+	void setWeights(Hashtable<String, Integer> weigths);
 	
 	/**
 	 * Applies utility function to finished state of the game. 

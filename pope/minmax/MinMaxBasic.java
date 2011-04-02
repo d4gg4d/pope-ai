@@ -2,7 +2,9 @@ package pope.minmax;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
+import pope.interfaces.Heuristics;
 import pope.interfaces.moveEvaluator;
 import fi.zem.aiarch.game.hierarchy.Board;
 import fi.zem.aiarch.game.hierarchy.Engine;
@@ -23,8 +25,13 @@ public class MinMaxBasic implements moveEvaluator
 	public static Engine GAME;	
 	public static Integer CUT_DEPTH;
 	
+	private Heuristics heuristics = new MinMaxHeuristic();
+
 	private GameTreeNode gameTree;
-		
+	
+	private Random rnd;
+	private Side sideOfAI;
+	
 	public MinMaxBasic(Situation root)
 	{
 		gameTree = new GameTreeNode(root, 0);
@@ -42,7 +49,7 @@ public class MinMaxBasic implements moveEvaluator
 			e.printStackTrace();
 
 			//FALLBACK MODE
-			return state.legal().get(0); 
+			return state.legal().get(rnd.nextInt()); 
 		}
 	}
 	
@@ -162,94 +169,33 @@ public class MinMaxBasic implements moveEvaluator
 	 */
 	private Integer utility(Situation state) throws Exception
 	{
-		Integer util;
-		if (state.getWinner() == state.getTurn())
+		if (state.isFinished())
 		{
-			util = Integer.MIN_VALUE; // should here be lose exception?
-		}
-		else if (state.getWinner() == state.getTurn().opposite())
-		{
-			util = Integer.MAX_VALUE; // should here be win exception, what it should do??
-		}
-		else if (state.getWinner() == Side.NONE)
-		{
-			util = 0;
+			return heuristics.evaluateFinnishedGame(state, state.getTurn());
 		}
 		else
 		{
-			// cut depth
-			util = evaluateInCompleteGame(state);
+			return heuristics.evaluateIncompleteGame(state);
 		}
-		return util;
 	}
 		
-	/**
-	 * Utility evaluator of Incomplete game.
-	 * 
-	 * @param state
-	 * @return
-	 */
-	private Integer evaluateInCompleteGame(Situation state)
-	{
-		Integer value = 0;
-		
-		Integer positionWeight = 10;
-		Integer firepowerWeight = 10;
-		Integer rankWeight = 10;
-		
-		Integer epositionWeight = 10;
-		Integer efirepowerWeight = 10;
-		Integer erankWeight = 50;
-				
-		Iterable<Square> own = state.getBoard().pieces(state.getTurn());
-		Iterable<Square> enemy = state.getBoard().pieces(state.getTurn().opposite());
-
-		//OWN AS POSITIVE value
-		
-		//eval own pieces position 
-		value += positionWeight * evalPiecesPosition(own, state.getTurn());
-		
-		//eval own pieces firepower
-		value += firepowerWeight * evalPiecesFirePower(own, state.getBoard(), state.getTurn());
-
-		//eval own pieces rank
-		value += rankWeight * evalPiecesRank(own);
-		
-		//ENEMY AS negative value
-		
-		//eval enemy pieces position 
-		value -= epositionWeight * evalPiecesPosition(enemy, state.getTurn().opposite());
-		
-		//eval enemy pieces firepower
-		value -= efirepowerWeight * evalPiecesFirePower(enemy, state.getBoard(), state.getTurn().opposite());
-
-		//eval enemy pieces rank
-		value -= erankWeight * evalPiecesRank(enemy);
-		
-		return value;
-	}
-	
-	private Integer evalPiecesRank(Iterable<Square> own) {
-		Integer value = 0;
-		for (Square current : own) {
-			value += current.getPiece().getValue();
-		}		
-		return value;
+	@Override
+	public void setAISide(Side side) {
+		sideOfAI = side;
 	}
 
-	private Integer evalPiecesFirePower(Iterable<Square> own, Board board, Side side) {
-		Integer value = 0;
-		for (Square current : own) {
-			value += board.firepower(side, current.getX(), current.getY());
-		}		
-		return value;
+	@Override
+	public void setEngine(Engine engine) {
+		GAME = engine;
 	}
 
-	private Integer evalPiecesPosition(Iterable<Square> own, Side side) {
-		Integer value = 0;
-		for (Square current : own) {
-			value -= (current.getOwner() == side.opposite()) ? 1 : 0;
-		}
-		return value;
+	@Override
+	public void setHeuristics(Heuristics heuristics) {
+		this.heuristics = heuristics;
+	}
+
+	@Override
+	public void setRandomEngine(Random rndGenerator) {
+		this.rnd = rndGenerator;
 	}
 }

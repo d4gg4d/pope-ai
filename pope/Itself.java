@@ -41,8 +41,8 @@ public class Itself implements Player {
 		
 		// create Components
 						
-		// weights for different aspects
-		heuristics.setWeights(new ArrayList<Integer>());		
+		// weights for different aspects giving null set all to one.
+		heuristics.setWeights(null);		
 	}
 	
 	public void start(Engine engine, Side side) 

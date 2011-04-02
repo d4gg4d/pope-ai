@@ -9,7 +9,8 @@ import fi.zem.aiarch.game.hierarchy.Situation;
 public interface Heuristics {
 
 	/**
-	 * Set weight parameters for different utility function components.
+	 * Set weight parameters for different utility function components. 
+	 * If weigths is null then weigths are ignored.
 	 */
 	void setWeights(Hashtable<String, Integer> weigths);
 	

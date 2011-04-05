@@ -1,12 +1,14 @@
 package pope;
 
-import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Random;
 
-import pope.interfaces.Heuristics;
-import pope.interfaces.ResourceManager;
-import pope.interfaces.moveEvaluator;
-import pope.minmax.MinMaxBasic;
+import pope.alphaBeta.AlphaBetaPruning;
+import pope.alphaBeta.SimpleHeuristics;
+import pope.interfaces.IHeuristics;
+import pope.interfaces.IResourceManager;
+import pope.interfaces.IMoveEvaluator;
+import pope.interfaces.IHeuristics.WeightNames;
 import fi.zem.aiarch.game.hierarchy.Engine;
 import fi.zem.aiarch.game.hierarchy.Move;
 import fi.zem.aiarch.game.hierarchy.Player;
@@ -24,13 +26,11 @@ import fi.zem.aiarch.game.hierarchy.Situation;
 
 public class Itself implements Player {
 	
-	private static final Integer DEFAULT_SEEKDEPTH = 3;
-
-	private moveEvaluator moveEvaluator;
+	private IMoveEvaluator moveEvaluator;
 	
-	private Heuristics heuristics;
+	private IHeuristics heuristics;
 	
-	private ResourceManager resourcesManager;
+	private IResourceManager resourcesManager;
 	
 	private Random rndGenerator;
 	
@@ -40,23 +40,41 @@ public class Itself implements Player {
 		this.rndGenerator = rnd;
 		
 		// create Components
-						
-		// weights for different aspects giving null set all to one.
-		heuristics.setWeights(null);		
+		heuristics = new SimpleHeuristics();						
+		heuristics.setWeights(weigths());
+		
+		moveEvaluator = new AlphaBetaPruning(new SimpleHeuristics());		
+		moveEvaluator.setRandomEngine(rnd);
+		moveEvaluator.setHeuristics(heuristics);
+		
+		resourcesManager = new ResourceManager(3);
 	}
 	
 	public void start(Engine engine, Side side) 
 	{
 		// init move Evaluator
-		moveEvaluator.setRandomEngine(rndGenerator);
-		moveEvaluator.setAISide(side);
+		moveEvaluator.setAISide(side);		
 		moveEvaluator.setEngine(engine);
-		moveEvaluator.setHeuristics(heuristics);		
+		
+		heuristics.setSide(side);
 	}
 	
 	public Move move(Situation situation, int timeLeft) 
 	{
 		Integer cutDepth = resourcesManager.calculateCutDepth(timeLeft);
 		return moveEvaluator.getBesMove(situation, cutDepth);
+	}
+	
+	private Hashtable<WeightNames, Integer> weigths()
+	{
+		Hashtable<WeightNames, Integer> tmp = new Hashtable<WeightNames, Integer>();
+		tmp.put(WeightNames.positionWeight, 1);
+		tmp.put(WeightNames.firepowerWeight, 3);
+		tmp.put(WeightNames.rankWeight, 30);
+
+		tmp.put(WeightNames.epositionWeight, 1);
+		tmp.put(WeightNames.efirepowerWeight, 3);
+		tmp.put(WeightNames.erankWeight, 30);
+		return tmp;
 	}
 }

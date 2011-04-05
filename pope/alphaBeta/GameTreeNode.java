@@ -1,4 +1,4 @@
-package pope.minmax;
+package pope.alphaBeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ import fi.zem.aiarch.game.hierarchy.Situation;
 
 public class GameTreeNode {
 
-	public Integer value;
+	public Integer value;	
 	public Situation state;
 	public Integer depth;
 	

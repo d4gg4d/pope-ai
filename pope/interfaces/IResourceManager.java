@@ -1,6 +1,6 @@
 package pope.interfaces;
 
-public interface ResourceManager 
+public interface IResourceManager 
 {
 	/**
 	 * Calculates cut depth respect to available game time.

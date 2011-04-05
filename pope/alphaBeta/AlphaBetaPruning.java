@@ -33,11 +33,10 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	
 	private Side sideOfAI;
 	
-	public AlphaBetaPruning(IHeuristics heuristic)
+	public AlphaBetaPruning()
 	{
-		heuristics = heuristic;
 	}
-
+	
 	@Override
 	public void setAISide(Side side) {
 		sideOfAI = side;
@@ -64,6 +63,7 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	@Override
 	public Move getBesMove(Situation state, Integer cutDepth) {
 		CUT_DEPTH = cutDepth;
+
 		gameTree = new GameTreeNodePrune(state, 0); //TODO better implementation of storaging game tree.
 		
 		try {
@@ -71,14 +71,16 @@ public class AlphaBetaPruning implements IMoveEvaluator
 			{
 				return state.legal(sideOfAI).get(0);
 			}
-			return alphaBetaSearch(state);
+			else 
+			{
+				return alphaBetaSearch(state);	
+			}
 		} catch (Exception e) {	
 			System.out.println("SEARCH FAILED: fallbacking to random move.");
 			e.printStackTrace();
-			return null;
 
-//			List<Move> moves = state.legal();
-//			return moves.get(rnd.nextInt(moves.size()));
+			List<Move> moves = state.legal();
+			return moves.get(rnd.nextInt(moves.size()));
 		}
 	}
 	
@@ -92,6 +94,8 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	public Move alphaBetaSearch(Situation state) throws Exception
 	{
 		Integer value = maxValue(gameTree, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+		//FIXME clean
 		System.out.println("best move is with value " + value);
 		
 		Situation bestNextSitutation;		
@@ -99,17 +103,21 @@ public class AlphaBetaPruning implements IMoveEvaluator
 		{
 			if (current.value.intValue() == value.intValue())
 			{		
+				//FIXME clean
 				System.out.println("found best mode");
 				bestNextSitutation = current.state;
 				return bestNextSitutation.getPreviousMove();
 			}
 		}
-				
+		
+		//FIXME clean
 		System.out.println("MOVE NOT FOUND!?");
+		
 		for (GameTreeNode current : gameTree.getChilds())
 		{
 			System.out.println("move with value " + current.value);
 		}
+		
 		throw new Exception("Error in selecting next move.");
 	}
 	
@@ -134,13 +142,16 @@ public class AlphaBetaPruning implements IMoveEvaluator
 		for (Situation current : nextPossibleStates(node.state) ) 
 		{
 			GameTreeNodePrune nextNode = new GameTreeNodePrune(current, node.depth + 1);
+		
 			value = Math.max(value, minValue(nextNode, a, b));			
 			node.value = value;
 			node.addChild(nextNode);
+
 			if (value >= b)
 			{
 				return value;
 			}
+			
 			a = Math.max(a, value);
 		}
 		return value;
@@ -167,13 +178,16 @@ public class AlphaBetaPruning implements IMoveEvaluator
 		for (Situation current : nextPossibleStates(node.state) ) 
 		{
 			GameTreeNodePrune nextNode = new GameTreeNodePrune(current, node.depth + 1);
+			
 			value = Math.min(value, maxValue(nextNode, a, b));
 			node.value = value;	
 			node.addChild(nextNode);
+			
 			if (value <= a)
 			{
 				return value;
 			}
+			
 			b = Math.min(b, value);
 		}
 		return value;
@@ -187,8 +201,7 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	 */
 	private Collection<Situation> nextPossibleStates(Situation state)
 	{
-		Collection<Situation> nextStates = new ArrayList<Situation>(); 
-				
+		Collection<Situation> nextStates = new ArrayList<Situation>();				
 		for (Move current : state.legal(state.getTurn())) 
 		{
 			nextStates.add(state.copyApply(current));
@@ -218,10 +231,11 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	{
 		if (state.isFinished())
 		{
-			System.out.println("Game ended in turn of " + state.getTurn().toString() + "and winner is" + state.getWinner().toString());
-			Integer val = heuristics.evaluateFinnishedGame(state);
-			System.out.println("utility value for player " + state.getTurn().toString() + " is " + val);
-			return val;
+			//FIXME clean
+		//	System.out.println("Game ended in turn of " + state.getTurn().toString() + "and winner is" + state.getWinner().toString());
+		//	Integer val = 
+		//	System.out.println("utility value for player " + state.getTurn().toString() + " is " + val);
+			return heuristics.evaluateFinnishedGame(state);
 		}
 		else
 		{

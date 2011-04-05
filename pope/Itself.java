@@ -6,8 +6,8 @@ import java.util.Random;
 import pope.alphaBeta.AlphaBetaPruning;
 import pope.alphaBeta.SimpleHeuristics;
 import pope.interfaces.IHeuristics;
-import pope.interfaces.IResourceManager;
 import pope.interfaces.IMoveEvaluator;
+import pope.interfaces.IResourceManager;
 import pope.interfaces.IHeuristics.WeightNames;
 import fi.zem.aiarch.game.hierarchy.Engine;
 import fi.zem.aiarch.game.hierarchy.Move;
@@ -25,29 +25,26 @@ import fi.zem.aiarch.game.hierarchy.Situation;
  */
 
 public class Itself implements Player {
-	
+			
 	private IMoveEvaluator moveEvaluator;
-	
-	private IHeuristics heuristics;
-	
+		
 	private IResourceManager resourcesManager;
 	
-	private Random rndGenerator;
-	
-	public Itself(Random rnd) 
-	{
-		// just in case
-		this.rndGenerator = rnd;
+	private IHeuristics heuristics;
 		
-		// create Components
+	public Itself(Random rnd) 
+	{		
+		// create heuristics
 		heuristics = new SimpleHeuristics();						
 		heuristics.setWeights(weigths());
 		
-		moveEvaluator = new AlphaBetaPruning(new SimpleHeuristics());		
+		// create move evaluator
+		moveEvaluator = new AlphaBetaPruning();		
 		moveEvaluator.setRandomEngine(rnd);
 		moveEvaluator.setHeuristics(heuristics);
 		
-		resourcesManager = new ResourceManager(3);
+		// craete Resource Manager
+		resourcesManager = new ResourceManager();
 	}
 	
 	public void start(Engine engine, Side side) 
@@ -56,11 +53,17 @@ public class Itself implements Player {
 		moveEvaluator.setAISide(side);		
 		moveEvaluator.setEngine(engine);
 		
+		// init heuristics
 		heuristics.setSide(side);
+		heuristics.setMode(IHeuristics.Mode.aggressive);
 	}
 	
 	public Move move(Situation situation, int timeLeft) 
 	{
+//		if (resourcesManager.changeMode(heuristics.evaluateIncompleteGame(situation)))
+//		{
+//			heuristics.setMode(resourcesManager.optimalMode(situation));
+//		}
 		Integer cutDepth = resourcesManager.calculateCutDepth(timeLeft);
 		return moveEvaluator.getBesMove(situation, cutDepth);
 	}

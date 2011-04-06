@@ -17,10 +17,10 @@
 	  code, so therefore should only contain lowercase
 	  letters of the English alphabet.
 	-->
-	<property name="bot" value="minmaxsimple" />
+	<property name="bot" value="pope" />
 	
 	<!-- The class implementing the Player interface: -->
-	<property name="botclass" value="SimpleVersion" />
+	<property name="botclass" value="Itself" />
 	
 	<!-- Your real name: -->
 	<property name="author" value="Sami Airaksinen" />

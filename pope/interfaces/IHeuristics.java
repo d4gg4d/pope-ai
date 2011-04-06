@@ -12,6 +12,10 @@ public interface IHeuristics {
 		epositionWeight, efirepowerWeight, erankWeight 
 	}
 	
+	public enum Mode {
+		aggressive, defensive 
+	}
+	
 	/**
 	 * Set weight parameters for different utility function components. 
 	 * If weigths is null then weigths are ignored.
@@ -27,9 +31,8 @@ public interface IHeuristics {
 	 * 	defines side to whom the utility is evaluated.
 	 * @return
 	 * 	utility value of finished game.
-	 * @throws Exception 
 	 */
-	Integer evaluateFinnishedGame(Situation state) throws Exception;
+	Integer evaluateFinnishedGame(Situation state);
 	
 	/**
 	 * Applies utility to non finished game.
@@ -39,7 +42,9 @@ public interface IHeuristics {
 	 * @return
 	 * 	utility of non finished game
 	 */
-	Integer evaluateIncompleteGame(Situation state, Side side);
+	Integer evaluateIncompleteGame(Situation state);
 
 	void setSide(Side side);
+
+	void setMode(Mode aggressive);
 }

@@ -4,7 +4,6 @@ import java.util.Hashtable;
 
 import pope.interfaces.IHeuristics;
 import fi.zem.aiarch.game.hierarchy.Board;
-import fi.zem.aiarch.game.hierarchy.Engine;
 import fi.zem.aiarch.game.hierarchy.Side;
 import fi.zem.aiarch.game.hierarchy.Situation;
 import fi.zem.aiarch.game.hierarchy.Board.Square;
@@ -18,6 +17,16 @@ public class SimpleHeuristics implements IHeuristics {
 	public SimpleHeuristics() {		
 	}
 
+	@Override
+	public void setSide(Side side) {
+		sideOfAI = side;
+	}
+	
+	@Override
+	public void setMode(Mode aggressive) {
+		// TODO Auto-generated method stub		
+	}
+	
 	@Override
 	public void setWeights(Hashtable<WeightNames, Integer> weigths) {
 		if (weigths == null)
@@ -40,15 +49,16 @@ public class SimpleHeuristics implements IHeuristics {
 	}
 
 	@Override
-	public Integer evaluateFinnishedGame(Situation state) throws Exception {
+	public Integer evaluateFinnishedGame(Situation state) 
+	{
 		Integer util;
 		if (state.getWinner() == sideOfAI)
 		{
-			util = 1000000;
+			util = Integer.MAX_VALUE;
 		}
 		else if (state.getWinner() == sideOfAI.opposite())
 		{
-			util = -1000000;
+			util = Integer.MIN_VALUE;
 		}
 		else
 		{
@@ -64,19 +74,20 @@ public class SimpleHeuristics implements IHeuristics {
 	 * @return
 	 */
 	@Override
-	public Integer evaluateIncompleteGame(Situation state, Side side) {
+	public Integer evaluateIncompleteGame(Situation state) 
+	{
 		Integer value = 0;
 						
-		Iterable<Square> own = state.getBoard().pieces(side);
-		Iterable<Square> enemy = state.getBoard().pieces(side.opposite());
+		Iterable<Square> own = state.getBoard().pieces(sideOfAI);
+		Iterable<Square> enemy = state.getBoard().pieces(sideOfAI.opposite());
 
 		//OWN AS POSITIVE value
 		
 		//eval own pieces position 
-		value += weights.get(WeightNames.positionWeight) * evalPiecesPosition(own, state.getTurn());
+		value += weights.get(WeightNames.positionWeight) * evalPiecesPosition(own, sideOfAI);//, state.getTurn());
 		
 		//eval own pieces firepower
-		value += weights.get(WeightNames.firepowerWeight) * evalPiecesFirePower(own, state.getBoard(), state.getTurn());
+		value += weights.get(WeightNames.firepowerWeight) * evalPiecesFirePower(own, state.getBoard(), sideOfAI);
 
 		//eval own pieces rank
 		value += weights.get(WeightNames.rankWeight) * evalPiecesRank(own);
@@ -84,10 +95,10 @@ public class SimpleHeuristics implements IHeuristics {
 		//ENEMY AS negative value
 		
 		//eval enemy pieces position 
-		value -= weights.get(WeightNames.epositionWeight) * evalPiecesPosition(enemy, state.getTurn().opposite());
+		value -= weights.get(WeightNames.epositionWeight) * evalPiecesPosition(enemy, sideOfAI.opposite());
 		
 		//eval enemy pieces firepower
-		value -= weights.get(WeightNames.efirepowerWeight) * evalPiecesFirePower(enemy, state.getBoard(), state.getTurn().opposite());
+		value -= weights.get(WeightNames.efirepowerWeight) * evalPiecesFirePower(enemy, state.getBoard(), sideOfAI.opposite());
 
 		//eval enemy pieces rank
 		value -= weights.get(WeightNames.erankWeight) * evalPiecesRank(enemy);
@@ -117,13 +128,8 @@ public class SimpleHeuristics implements IHeuristics {
 		for (Square current : own) {
 			Integer factor = current.getPiece().getValue();
 			value += (current.getOwner() == side.opposite()) ? -1*factor : 0;
-			value += (current.getOwner() == side.NONE) ? 2/factor : 0;
+			value += (current.getOwner() == Side.NONE) ? 2/factor : 0;
 		}
 		return value;
-	}
-
-	@Override
-	public void setSide(Side side) {
-		sideOfAI = side;
 	}
 }

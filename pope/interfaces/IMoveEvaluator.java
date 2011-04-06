@@ -23,10 +23,13 @@ public interface IMoveEvaluator
 	 * 	current State of the game
 	 * @param cutDepth
 	 * 	depth of the tree where to cut the Search
+	 * @param haltingCondition 
 	 * @return
 	 * 	Best move evaluated in given time limit.
+	 * @throws Exception
+	 *  
 	 */
-	Move getBesMove(Situation state, Integer cutDepth);
+	Move getBesMove(Situation state, Integer cutDepth) throws Exception;
 
 	/**
 	 * set game engine for moveEvaluator
@@ -54,5 +57,11 @@ public interface IMoveEvaluator
 	 * 
 	 * @param rndGenerator
 	 */
-	void setRandomEngine(Random rndGenerator);	
+	void setRandomEngine(Random rndGenerator);
+
+	Move getFallBackMove(Situation situation);
+
+	boolean isPathOfWinningMove(Move nextMove);
+
+	void setHaltingCondition(IHaltingCondition haltingCondition);	
 }

@@ -227,19 +227,15 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	 * @return Utility value of current state.
 	 * @throws Exception
 	 */
-	private Integer utility(Situation state) throws Exception
+	private Integer utility(Situation state)
 	{
 		if (state.isFinished())
 		{
-			//FIXME clean
-		//	System.out.println("Game ended in turn of " + state.getTurn().toString() + "and winner is" + state.getWinner().toString());
-		//	Integer val = 
-		//	System.out.println("utility value for player " + state.getTurn().toString() + " is " + val);
 			return heuristics.evaluateFinnishedGame(state);
 		}
 		else
 		{
-			return heuristics.evaluateIncompleteGame(state, state.getTurn());
+			return heuristics.evaluateIncompleteGame(state);
 		}
 	}
 }

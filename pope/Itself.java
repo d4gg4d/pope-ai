@@ -72,12 +72,12 @@ public class Itself implements Player {
 	{
 		Hashtable<WeightNames, Integer> tmp = new Hashtable<WeightNames, Integer>();
 		tmp.put(WeightNames.positionWeight, 1);
-		tmp.put(WeightNames.firepowerWeight, 3);
+		tmp.put(WeightNames.firepowerWeight, 5);
 		tmp.put(WeightNames.rankWeight, 30);
 
 		tmp.put(WeightNames.epositionWeight, 1);
 		tmp.put(WeightNames.efirepowerWeight, 3);
-		tmp.put(WeightNames.erankWeight, 30);
+		tmp.put(WeightNames.erankWeight, 40);
 		return tmp;
 	}
 }

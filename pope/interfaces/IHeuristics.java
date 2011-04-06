@@ -42,7 +42,7 @@ public interface IHeuristics {
 	 * @return
 	 * 	utility of non finished game
 	 */
-	Integer evaluateIncompleteGame(Situation state, Side side);
+	Integer evaluateIncompleteGame(Situation state);
 
 	void setSide(Side side);
 

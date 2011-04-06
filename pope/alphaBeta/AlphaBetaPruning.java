@@ -5,11 +5,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import pope.SoftTimeLimitException;
+import pope.interfaces.IHaltingCondition;
 import pope.interfaces.IHeuristics;
 import pope.interfaces.IMoveEvaluator;
 
 import fi.zem.aiarch.game.hierarchy.Engine;
 import fi.zem.aiarch.game.hierarchy.Move;
+import fi.zem.aiarch.game.hierarchy.MoveType;
 import fi.zem.aiarch.game.hierarchy.Side;
 import fi.zem.aiarch.game.hierarchy.Situation;
 
@@ -22,8 +25,8 @@ import fi.zem.aiarch.game.hierarchy.Situation;
 
 public class AlphaBetaPruning implements IMoveEvaluator 
 {	
-	public static Engine GAME;	
-	public static Integer CUT_DEPTH;
+	public Engine GAME;
+	public Integer CUT_DEPTH;
 	
 	private IHeuristics heuristics;
 
@@ -32,6 +35,7 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	private Random rnd;
 	
 	private Side sideOfAI;
+	private IHaltingCondition halter;
 	
 	public AlphaBetaPruning()
 	{
@@ -57,30 +61,56 @@ public class AlphaBetaPruning implements IMoveEvaluator
 		this.rnd = rndGenerator;
 	}
 	
+	@Override
+	public void setHaltingCondition(IHaltingCondition haltingCondition) {
+		halter = haltingCondition;
+	}
+	
+	@Override
+	public Move getFallBackMove(Situation situation) {
+		List<Move> moves = situation.legal(sideOfAI);
+		return moves.get(rnd.nextInt(moves.size()));
+	}
+
+	@Override
+	public boolean isPathOfWinningMove(Move nextMove) {
+		if (nextMove.getType() == MoveType.DESTROY || nextMove.getType() == MoveType.PASS)
+		{
+			return true;
+		} 
+		else if (gameTree != null)
+		{
+			Situation toBeState = gameTree.state.copyApply(nextMove);
+			
+			for (GameTreeNode current : gameTree.getChilds()) {
+				if (current.state.equals(toBeState))
+				{
+					return (current.value == Integer.MAX_VALUE); //FIXME ask for WinUtility from heuristics.
+				}
+			}
+		}
+		return false;
+	}
+	
 	/**
+	 * @throws Exception 
 	 * @inherit
 	 */
 	@Override
-	public Move getBesMove(Situation state, Integer cutDepth) {
-		CUT_DEPTH = cutDepth;
-
-		gameTree = new GameTreeNodePrune(state, 0); //TODO better implementation of storaging game tree.
+	public Move getBesMove(Situation state, Integer cutDepth) throws Exception {
 		
-		try {
-			if (state.mustFinishAttack())
-			{
-				return state.legal(sideOfAI).get(0);
-			}
-			else 
-			{
-				return alphaBetaSearch(state);	
-			}
-		} catch (Exception e) {	
-			System.out.println("SEARCH FAILED: fallbacking to random move.");
-			e.printStackTrace();
+		//TODO move to setters...
+		CUT_DEPTH = cutDepth;
+		
+		gameTree = new GameTreeNodePrune(state, 0); //TODO better implementation of storaging game tree.
 
-			List<Move> moves = state.legal();
-			return moves.get(rnd.nextInt(moves.size()));
+		if (state.mustFinishAttack())
+		{
+			return state.legal(sideOfAI).get(0);
+		}
+		else 
+		{
+			return alphaBetaSearch(state);	
 		}
 	}
 	
@@ -88,6 +118,7 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	 * Actual decision maker.
 	 * 
 	 * @param state current State of The game.
+	 * @param haltingCondition 
 	 * @return best possible move to MaxPlayer (player that has turn)
 	 * @throws Exception 
 	 */
@@ -108,8 +139,7 @@ public class AlphaBetaPruning implements IMoveEvaluator
 				bestNextSitutation = current.state;
 				return bestNextSitutation.getPreviousMove();
 			}
-		}
-		
+		}		
 		//FIXME clean
 		System.out.println("MOVE NOT FOUND!?");
 		
@@ -118,7 +148,7 @@ public class AlphaBetaPruning implements IMoveEvaluator
 			System.out.println("move with value " + current.value);
 		}
 		
-		throw new Exception("Error in selecting next move.");
+		throw new Exception("Error in selecting next move, move not found from the child nodes.");
 	}
 	
 	/**
@@ -131,7 +161,7 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	 * @throws Exception
 	 */
 	private Integer maxValue(GameTreeNodePrune node, Integer a, Integer b) throws Exception
-	{
+	{	
 		if (terminalTest(node)) 
 		{
 			return utility(node.state);
@@ -214,9 +244,11 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	 * 
 	 * @param node
 	 * @return
+	 * @throws SoftTimeLimitException 
 	 */
-	private Boolean terminalTest(GameTreeNode node)
+	private Boolean terminalTest(GameTreeNode node) throws SoftTimeLimitException
 	{
+		halter.isTimeLimitReached();
 		return  node.depth > CUT_DEPTH || node.state.isFinished();
 	}
 		

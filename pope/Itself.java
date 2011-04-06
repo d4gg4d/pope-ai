@@ -5,13 +5,12 @@ import java.util.Random;
 
 import pope.alphaBeta.AlphaBetaPruning;
 import pope.alphaBeta.SimpleHeuristics;
-
 import pope.interfaces.IHaltingCondition;
 import pope.interfaces.IHeuristics;
 import pope.interfaces.IMoveEvaluator;
 import pope.interfaces.IResourceManager;
 import pope.interfaces.IHeuristics.WeightNames;
-
+import pope.interfaces.IHeuristics.WeigthOwner;
 import fi.zem.aiarch.game.hierarchy.Engine;
 import fi.zem.aiarch.game.hierarchy.Move;
 import fi.zem.aiarch.game.hierarchy.Player;
@@ -40,23 +39,26 @@ public class Itself implements Player {
 	
 	private IHeuristics heuristics;
 		
-	public Itself(Random rnd) 
+	public Itself(Random rnd)
 	{		
 		// create heuristics
 		heuristics = new SimpleHeuristics();						
-		heuristics.setWeights(weigths());
+		heuristics.setWeights(WeigthOwner.own, weigths(1,3,30));
+		heuristics.setWeights(WeigthOwner.enemy, weigths(1,3,30));
 		
 		// create move evaluator
 		moveEvaluator = new AlphaBetaPruning();		
 		moveEvaluator.setRandomEngine(rnd);
 		moveEvaluator.setHeuristics(heuristics);		
+
+		//create Resource Manager
 		resourceManager = new ResourceManager(TOTAL_GAMETIME, MAX_TURNS);
 	}
 	
 	public void start(Engine engine, Side side) 
 	{
 		sideOfAI = side;
-		
+				
 		// init move Evaluator
 		moveEvaluator.setAISide(side);		
 		moveEvaluator.setEngine(engine);
@@ -123,16 +125,12 @@ public class Itself implements Player {
 		return nextMove;
 	}
 	
-	private Hashtable<WeightNames, Integer> weigths()
+	private Hashtable<WeightNames, Integer> weigths(int pos, int fp, int r)
 	{
 		Hashtable<WeightNames, Integer> tmp = new Hashtable<WeightNames, Integer>();
-		tmp.put(WeightNames.positionWeight, 1);
-		tmp.put(WeightNames.firepowerWeight, 3);
-		tmp.put(WeightNames.rankWeight, 30);
-
-		tmp.put(WeightNames.epositionWeight, 1);
-		tmp.put(WeightNames.efirepowerWeight, 3);
-		tmp.put(WeightNames.erankWeight, 30);
+		tmp.put(WeightNames.positionWeight, pos);
+		tmp.put(WeightNames.firepowerWeight, fp);
+		tmp.put(WeightNames.rankWeight, r);
 		return tmp;
 	}
 }

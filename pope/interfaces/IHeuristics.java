@@ -2,6 +2,7 @@ package pope.interfaces;
 
 import java.util.Hashtable;
 
+import fi.zem.aiarch.game.hierarchy.Engine;
 import fi.zem.aiarch.game.hierarchy.Side;
 import fi.zem.aiarch.game.hierarchy.Situation;
 
@@ -48,6 +49,10 @@ public interface IHeuristics {
 	Integer evaluateIncompleteGame(Situation state);
 
 	void setSide(Side side);
+	
+	void setEngine(Engine engine);
 
 	void setMode(Mode aggressive);
+	
+	void init();
 }

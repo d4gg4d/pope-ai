@@ -4,6 +4,8 @@ import java.util.Hashtable;
 
 import pope.interfaces.IHeuristics;
 import fi.zem.aiarch.game.hierarchy.Board;
+import fi.zem.aiarch.game.hierarchy.Coord;
+import fi.zem.aiarch.game.hierarchy.Engine;
 import fi.zem.aiarch.game.hierarchy.Side;
 import fi.zem.aiarch.game.hierarchy.Situation;
 import fi.zem.aiarch.game.hierarchy.Board.Square;
@@ -15,6 +17,10 @@ public class SimpleHeuristics implements IHeuristics {
 	public Side sideOfAI;
 	
 	private Board board;
+	private Engine engine;
+	
+	private int maxPiece;
+	private Coord desiredPosition;
 	
 	public SimpleHeuristics() {
 		weights = new Hashtable<WeigthOwner, Hashtable<WeightNames,Integer>>();
@@ -28,6 +34,23 @@ public class SimpleHeuristics implements IHeuristics {
 	@Override
 	public void setMode(Mode aggressive) {
 		// TODO Auto-generated method stub		
+	}
+		
+	@Override
+	public void setEngine(Engine engine) {
+		this.engine = engine;
+		this.maxPiece = engine.getMaxPiece();		
+	}
+	
+	public void init() {
+		if (engine.makeInitial().getBoard().get(0,0).getSide() == sideOfAI)
+		{
+			desiredPosition = engine.makeCoord(0, 0);			
+		}
+		else
+		{
+			desiredPosition = engine.makeCoord(engine.getBoardWidth(), engine.getBoardWidth());
+		}
 	}
 	
 	@Override
@@ -83,12 +106,29 @@ public class SimpleHeuristics implements IHeuristics {
 		//OWN AS POSITIVE
 		value += weightedSum(weights.get(WeigthOwner.own), own, sideOfAI);
 		
+		//CALCULATE OWN HEAD PIECE POSITION (SPRING LIKE)
+		value -= postionOfMaxPiece(own);
+		
 		//ENEMY AS NEGATIVE
 		value -= weightedSum(weights.get(WeigthOwner.enemy), enemy, sideOfAI.opposite());
 		
 		return value;
 	}
 	
+	private Integer postionOfMaxPiece(Iterable<Square> own) {		
+		for (Square current : own) {
+			if (current.getPiece().getValue() == maxPiece)
+			{
+				return norm(current.getX(), current.getY(), desiredPosition.getX(), desiredPosition.getY());
+			}
+		}
+		return null;
+	}
+
+	private Integer norm(int x, int y, int x2, int y2) {
+		return (int) (Math.pow(x-x2, 2) + Math.pow(y-y2,2));
+	}
+
 	private int weightedSum(Hashtable<WeightNames, Integer> w, Iterable<Square> enemy, Side side)			
 	{
 			int value = 0;
@@ -100,6 +140,7 @@ public class SimpleHeuristics implements IHeuristics {
 
 			//eval own pieces rank
 			value += w.get(WeightNames.rankWeight) * evalPiecesRank(enemy);
+						
 			return value;
 	}
 			
@@ -125,7 +166,7 @@ public class SimpleHeuristics implements IHeuristics {
 		for (Square current : own) {
 			Integer factor = current.getPiece().getValue();
 			value += (current.getOwner() == side.opposite()) ? -1*factor : 0;
-			value += (current.getOwner() == Side.NONE) ? 2/factor : 0;
+			value += (current.getOwner() == Side.NONE) ? maxPiece/(2*factor) : 0;
 		}
 		return value;
 	}

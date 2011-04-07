@@ -43,8 +43,8 @@ public class Itself implements Player {
 	{		
 		// create heuristics
 		heuristics = new SimpleHeuristics();						
-		heuristics.setWeights(WeigthOwner.own, weigths(1,3,30));
-		heuristics.setWeights(WeigthOwner.enemy, weigths(1,3,30));
+		heuristics.setWeights(WeigthOwner.own, weigths(1,5,30));
+		heuristics.setWeights(WeigthOwner.enemy, weigths(1,3,50));
 		
 		// create move evaluator
 		moveEvaluator = new AlphaBetaPruning();		
@@ -66,9 +66,9 @@ public class Itself implements Player {
 			
 			@Override
 			public void isTimeLimitReached() throws SoftTimeLimitException {
-				if (resourceManager.timeLimitReached())
+				if (resourceManager.timeLimitReached() || resourceManager.memoryLimitReached())
 				{
-					System.out.println("SoftTime limit reached.");					
+					System.out.println("SoftTime/mem limit reached.");					
 					throw new SoftTimeLimitException();
 				}
 			}
@@ -76,7 +76,9 @@ public class Itself implements Player {
 		
 		// init heuristics
 		heuristics.setSide(side);
+		heuristics.setEngine(engine);
 		heuristics.setMode(IHeuristics.Mode.aggressive);
+		heuristics.init();
 	}
 	
 	/**

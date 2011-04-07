@@ -15,4 +15,6 @@ public interface IResourceManager
 	public boolean timeLimitReached();
 
 	void startTurn(Side side, int timeLeft);
+
+	boolean memoryLimitReached();
 }

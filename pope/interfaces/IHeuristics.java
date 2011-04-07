@@ -2,25 +2,29 @@ package pope.interfaces;
 
 import java.util.Hashtable;
 
+import fi.zem.aiarch.game.hierarchy.Engine;
 import fi.zem.aiarch.game.hierarchy.Side;
 import fi.zem.aiarch.game.hierarchy.Situation;
 
 public interface IHeuristics {
 
 	public enum WeightNames {
-		positionWeight, firepowerWeight, rankWeight, 		
-		epositionWeight, efirepowerWeight, erankWeight 
+		positionWeight, firepowerWeight, rankWeight 		
 	}
 	
 	public enum Mode {
 		aggressive, defensive 
 	}
 	
+	public enum WeigthOwner {
+		own, enemy
+	}
+		
 	/**
 	 * Set weight parameters for different utility function components. 
 	 * If weigths is null then weigths are ignored.
 	 */
-	void setWeights(Hashtable<WeightNames, Integer> weigths);
+	void setWeights(WeigthOwner side, Hashtable<WeightNames, Integer> weigths);
 	
 	/**
 	 * Applies utility function to finished state of the game. 
@@ -45,6 +49,10 @@ public interface IHeuristics {
 	Integer evaluateIncompleteGame(Situation state);
 
 	void setSide(Side side);
+	
+	void setEngine(Engine engine);
 
 	void setMode(Mode aggressive);
+	
+	void init();
 }

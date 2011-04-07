@@ -1,5 +1,7 @@
 package pope.interfaces;
 
+import fi.zem.aiarch.game.hierarchy.Side;
+
 public interface IResourceManager 
 {
 	/**
@@ -9,4 +11,10 @@ public interface IResourceManager
 	 * @return
 	 */
 	Integer calculateCutDepth(int timeLeft);
+
+	public boolean timeLimitReached();
+
+	void startTurn(Side side, int timeLeft);
+
+	boolean memoryLimitReached();
 }

@@ -43,8 +43,8 @@ public class Itself implements Player {
 	{		
 		// create heuristics
 		heuristics = new SimpleHeuristics();						
-		heuristics.setWeights(WeigthOwner.own, weigths(2,100,10));
-		heuristics.setWeights(WeigthOwner.enemy, weigths(0,3,500));
+		heuristics.setWeights(WeigthOwner.own, weigths(2,10,250,100));
+		heuristics.setWeights(WeigthOwner.enemy, weigths(0,20,500,0));
 		
 		// create move evaluator
 		moveEvaluator = new AlphaBetaPruning();		
@@ -125,12 +125,13 @@ public class Itself implements Player {
 		return nextMove;
 	}
 	
-	private Hashtable<WeightNames, Integer> weigths(int pos, int fp, int r)
+	private Hashtable<WeightNames, Integer> weigths(int pos, int fp, int r, int sf)
 	{
 		Hashtable<WeightNames, Integer> tmp = new Hashtable<WeightNames, Integer>();
 		tmp.put(WeightNames.positionWeight, pos);
 		tmp.put(WeightNames.firepowerWeight, fp);
 		tmp.put(WeightNames.rankWeight, r);
+		tmp.put(WeightNames.maxPieceSpring, sf);
 		return tmp;
 	}
 }

@@ -9,7 +9,7 @@ import fi.zem.aiarch.game.hierarchy.Situation;
 public interface IHeuristics {
 
 	public enum WeightNames {
-		positionWeight, firepowerWeight, rankWeight 		
+		positionWeight, firepowerWeight, rankWeight, maxPieceSpring 		
 	}
 	
 	public enum Mode {

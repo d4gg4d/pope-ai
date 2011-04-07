@@ -107,7 +107,7 @@ public class SimpleHeuristics implements IHeuristics {
 		value += weightedSum(weights.get(WeigthOwner.own), own, sideOfAI);
 		
 		//CALCULATE OWN HEAD PIECE POSITION (SPRING LIKE)
-		value -= postionOfMaxPiece(own);
+		value -= weights.get(WeigthOwner.own).get(WeightNames.maxPieceSpring)*postionOfMaxPiece(own);
 		
 		//ENEMY AS NEGATIVE
 		value -= weightedSum(weights.get(WeigthOwner.enemy), enemy, sideOfAI.opposite());
@@ -147,7 +147,8 @@ public class SimpleHeuristics implements IHeuristics {
 	private Integer evalPiecesRank(Iterable<Square> own) {
 		Integer value = 0;
 		for (Square current : own) {
-			value += current.getPiece().getValue();
+			int tmp = current.getPiece().getValue();
+			value += (tmp > 1)? tmp/2: tmp;
 		}		
 		return value;
 	}

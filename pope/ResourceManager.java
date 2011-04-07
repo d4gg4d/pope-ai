@@ -45,15 +45,10 @@ public class ResourceManager implements IResourceManager {
 		timer = new SoftTimeLimiter(timeLeft);
 		timer.start(side);
 		nextTimeInterval = timeLeft - timeStep;
-		//FIXME
-//		System.out.println("Starting turn, (time left, nextStop):" + timer.getTimeLeft() + " : " + nextTimeInterval);
-//		System.out.println("(timeLimit, timer.timeLimit):" + timeLeft + " : " + timer.getTimeLimit());
 	}
 
 	@Override
 	public boolean timeLimitReached() {
-		//FIXME
-//		System.out.println("timer: " + timer.getTimeLeft());
 		if (timer.getTimeLeft() > nextTimeInterval)
 		{
 			return false;
@@ -61,20 +56,22 @@ public class ResourceManager implements IResourceManager {
 		else
 		{
 			timer.stop();
+			System.out.println("time limit");
 			return true;
 		}
 	}
 
 	@Override
 	public boolean memoryLimitReached() {
-//		System.out.println("mem: " + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() +":" + memoryLimit);		
-		if (ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() > memoryLimit)
+		if (ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() < memoryLimit)
 		{
-			return true;
+			return false;
 		}
 		else
 		{
-			return false;
+			System.out.println("mem limit");
+			timer.stop();
+			return true;
 		}
 	}
 }

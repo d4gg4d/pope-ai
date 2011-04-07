@@ -49,6 +49,7 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	@Override
 	public void setEngine(Engine engine) {
 		GAME = engine;
+		GameTreeNodePrune.engine = engine;
 	}
 
 	@Override
@@ -80,10 +81,10 @@ public class AlphaBetaPruning implements IMoveEvaluator
 		} 
 		else if (gameTree != null)
 		{
-			Situation toBeState = gameTree.state.copyApply(nextMove);
+			Situation toBeState = gameTree.getState().copyApply(nextMove);
 			
 			for (GameTreeNode current : gameTree.getChilds()) {
-				if (current.state.equals(toBeState))
+				if (((GameTreeNodePrune) current).getState().equals(toBeState))
 				{
 					return (current.value == Integer.MAX_VALUE); //FIXME ask for WinUtility from heuristics.
 				}
@@ -102,8 +103,9 @@ public class AlphaBetaPruning implements IMoveEvaluator
 		//TODO move to setters...
 		CUT_DEPTH = cutDepth;
 		
-		gameTree = new GameTreeNodePrune(state, 0); //TODO better implementation of storaging game tree.
-
+		gameTree = new GameTreeNodePrune(state, 0);
+		System.gc(); //Clean!
+		
 		if (state.mustFinishAttack())
 		{
 			return state.legal(sideOfAI).get(0);
@@ -131,12 +133,12 @@ public class AlphaBetaPruning implements IMoveEvaluator
 		
 		Situation bestNextSitutation;		
 		for (GameTreeNode current : gameTree.getChilds())
-		{
+		{			
 			if (current.value.intValue() == value.intValue())
 			{		
 				//FIXME clean
 				System.out.println("found best mode");
-				bestNextSitutation = current.state;
+				bestNextSitutation = ((GameTreeNodePrune) current).getState();
 				return bestNextSitutation.getPreviousMove();
 			}
 		}		
@@ -164,12 +166,12 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	{	
 		if (terminalTest(node)) 
 		{
-			return utility(node.state);
+			return utility(node.getState());
 		}
 		
 		Integer value = Integer.MIN_VALUE;
 				
-		for (Situation current : nextPossibleStates(node.state) ) 
+		for (Situation current : nextPossibleStates(node.getState()) ) 
 		{
 			GameTreeNodePrune nextNode = new GameTreeNodePrune(current, node.depth + 1);
 		
@@ -200,12 +202,12 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	{
 		if (terminalTest(node)) 
 		{
-			return utility(node.state);
+			return utility(node.getState());
 		}
 		
 		Integer value = Integer.MAX_VALUE;
 		
-		for (Situation current : nextPossibleStates(node.state) ) 
+		for (Situation current : nextPossibleStates(node.getState()) ) 
 		{
 			GameTreeNodePrune nextNode = new GameTreeNodePrune(current, node.depth + 1);
 			
@@ -246,10 +248,10 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	 * @return
 	 * @throws SoftTimeLimitException 
 	 */
-	private Boolean terminalTest(GameTreeNode node) throws SoftTimeLimitException
+	private Boolean terminalTest(GameTreeNodePrune node) throws SoftTimeLimitException
 	{
 		halter.isTimeLimitReached();
-		return  node.depth > CUT_DEPTH || node.state.isFinished();
+		return  node.depth > CUT_DEPTH || node.getState().isFinished();
 	}
 		
 	/**

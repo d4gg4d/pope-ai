@@ -29,7 +29,7 @@ import fi.zem.aiarch.game.hierarchy.Situation;
 public class Itself implements Player {
 	
 	private static int TOTAL_GAMETIME = 1000;
-	private static int MAX_TURNS = 120;
+	private static int MAX_TURNS = 100;
 	
 	private Side sideOfAI;
 	
@@ -43,8 +43,8 @@ public class Itself implements Player {
 	{		
 		// create heuristics
 		heuristics = new SimpleHeuristics();						
-		heuristics.setWeights(WeigthOwner.own, weigths(1,5,30));
-		heuristics.setWeights(WeigthOwner.enemy, weigths(1,3,50));
+		heuristics.setWeights(WeigthOwner.own, weigths(2,100,10));
+		heuristics.setWeights(WeigthOwner.enemy, weigths(0,3,500));
 		
 		// create move evaluator
 		moveEvaluator = new AlphaBetaPruning();		
@@ -87,9 +87,7 @@ public class Itself implements Player {
 	public Move move(Situation situation, int timeLeft) 
 	{
 		resourceManager.startTurn(sideOfAI, timeLeft);
-		
-		//TODO check good heuristic for the current game situation.
-		
+				
 		//creating fallback mode;
 		Move nextMove = moveEvaluator.getFallBackMove(situation);				
 		

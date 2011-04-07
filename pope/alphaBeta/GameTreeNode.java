@@ -8,14 +8,12 @@ import fi.zem.aiarch.game.hierarchy.Situation;
 public class GameTreeNode {
 
 	public Integer value;	
-	public Situation state;
 	public Integer depth;
 	
 	private ArrayList<GameTreeNode> childs;
 	
 	public GameTreeNode(Situation state, Integer depth)
 	{
-		this.state = state;
 		this.depth = depth;
 		childs = new ArrayList<GameTreeNode>();
 	}
@@ -28,5 +26,5 @@ public class GameTreeNode {
 	public List<GameTreeNode> getChilds()
 	{
 		return childs;
-	}	
+	}
 }

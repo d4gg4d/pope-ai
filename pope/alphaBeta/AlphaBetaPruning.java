@@ -18,7 +18,7 @@ import fi.zem.aiarch.game.hierarchy.Situation;
 
 /**
  * 
- * Classic MinMax adversarial search Algorithm with tree memorization.
+ * Classic AlphaBeta pruning adversarial search Algorithm with tree memorization.
  * 
  * @author Sami Airaksinen
  */
@@ -127,23 +127,16 @@ public class AlphaBetaPruning implements IMoveEvaluator
 	public Move alphaBetaSearch(Situation state) throws Exception
 	{
 		Integer value = maxValue(gameTree, Integer.MIN_VALUE, Integer.MAX_VALUE);
-
-		//FIXME clean
-		System.out.println("best move is with value " + value);
 		
 		Situation bestNextSitutation;		
 		for (GameTreeNode current : gameTree.getChilds())
 		{			
 			if (current.value.intValue() == value.intValue())
 			{		
-				//FIXME clean
-				System.out.println("found best mode");
 				bestNextSitutation = ((GameTreeNodePrune) current).getState();
 				return bestNextSitutation.getPreviousMove();
 			}
 		}		
-		//FIXME clean
-		System.out.println("MOVE NOT FOUND!?");
 		
 		for (GameTreeNode current : gameTree.getChilds())
 		{

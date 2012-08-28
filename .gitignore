@@ -2,3 +2,5 @@
 *core
 *.jar
 *#*#
+releaseJar/
+createRelease.sh

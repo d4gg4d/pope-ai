@@ -28,8 +28,8 @@ import fi.zem.aiarch.game.hierarchy.Situation;
 
 public class Itself implements Player {
 	
-	private static int TOTAL_GAMETIME = 1000;
-	private static int MAX_TURNS = 100;
+	private static int TOTAL_GAMETIME = 3600;
+	private static int MAX_TURNS = 150;
 	
 	private Side sideOfAI;
 	
@@ -68,7 +68,6 @@ public class Itself implements Player {
 			public void isTimeLimitReached() throws SoftTimeLimitException {
 				if (resourceManager.timeLimitReached() || resourceManager.memoryLimitReached())
 				{
-					System.out.println("SoftTime/mem limit reached.");					
 					throw new SoftTimeLimitException();
 				}
 			}
@@ -95,33 +94,28 @@ public class Itself implements Player {
 		{
 			// popping out of this loop when time limiter hits the wall or nextMove is known to be Winning game path.
 			for (int searchDepth = 1; searchDepth <  resourceManager.calculateCutDepth(timeLeft) ; searchDepth++) {
-				System.out.println("Starting seekdepth: " + searchDepth); //FIXME CLEAN
 				
 				nextMove = moveEvaluator.getBesMove(situation, searchDepth);
 				
 				if (moveEvaluator.isPathOfWinningMove(nextMove))
 				{
-					System.out.println("found Blocking or winning move."); //FIXME CLEAN
 					return nextMove;
 				}
 			}
 		}
 		catch (SoftTimeLimitException e)
 		{
-			System.out.println("ITSELF>SoftLimit passing last found move."); //FIXME CLEAN
 			// catch Halting condition, at the moment nextMove has best possible move (naturally incomplete stateSearch is discarded).
 			return nextMove;
 		}
 		catch (Exception e)
 		{
-			System.out.println("SEARCH FAILED: fallbacking to random move."); //FIXME CLEAN
 			e.printStackTrace();
 
 			return moveEvaluator.getFallBackMove(situation);
 		}
 		
 		//To get here we have been searched all the game states, and then some but not found winning condition... so.
-		System.out.println("Found route to place where shouldn't be!(?)"); //FIXME CLEAN
 		return nextMove;
 	}
 	
